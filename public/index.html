@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalable Web Server</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Scalable Web Server</h1>
+            <p>A lightweight, feature-rich HTTP server built with Node.js</p>
+        </header>
+        
+        <main>
+            <section class="features">
+                <h2>✨ Core Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🌐 HTTP Server</h3>
+                        <p>Handles GET/POST requests with manual routing</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📁 Static Files</h3>
+                        <p>Serves HTML, CSS, JS, and images from /public directory</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🛣️ Routing System</h3>
+                        <p>Dynamic route handling with parameter support</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📝 Logging</h3>
+                        <p>Request logging middleware for debugging</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔧 JSON API</h3>
+                        <p>RESTful API endpoints returning JSON</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📤 File Upload</h3>
+                        <p>Upload endpoint with size and type validation</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="demo-section">
+                <h2>🧪 Try It Out</h2>
+                
+                <div class="demo-grid">
+                    <div class="demo-card">
+                        <h3>API Endpoints</h3>
+                        <div class="endpoint-list">
+                            <a href="/api/data" target="_blank" class="endpoint">
+                                <code>GET /api/data</code>
+                                <span>→ JSON Response</span>
+                            </a>
+                            <a href="/api/evolution" target="_blank" class="endpoint">
+                                <code>GET /api/evolution</code>
+                                <span>→ Server Evolution</span>
+                            </a>
+                        </div>
+                        
+                        <div class="form-demo">
+                            <h4>Test POST Request</h4>
+                            <form id="postForm">
+                                <input type="text" name="message" placeholder="Enter a message" required>
+                                <button type="submit">Send POST Request</button>
+                            </form>
+                            <div id="postResult" class="result"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="demo-card">
+                        <h3>File Upload</h3>
+                        <p>Upload images or PDFs (max 10MB)</p>
+                        <a href="/upload" class="upload-link">Go to Upload Form →</a>
+                        
+                        <div class="quick-actions">
+                            <h4>Quick Actions</h4>
+                            <button onclick="testServer()">Test Server</button>
+                            <button onclick="clearLogs()">Clear Console</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="instructions">
+                <h2>📚 Getting Started</h2>
+                <div class="code-block">
+                    <pre><code># Clone and install
+git clone [repository-url]
+cd webserver
+npm install
+
+# Start the server
+npm start
+
+# Development mode
+npm run dev</code></pre>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Built with Node.js | Check the <a href="https://github.com/yourusername/webserver" target="_blank">GitHub Repository</a></p>
+        </footer>
+    </div>
+    
+    <script src="app.js"></script>
+
+    <!-- Add these sections to your existing index.html -->
+
+<section class="new-features">
+    <h2>✨ New Advanced Features</h2>
+    
+    <div class="feature-showcase">
+        <div class="feature-card">
+            <h3>🔌 WebSocket Real-Time</h3>
+            <p>Experience real-time communication with WebSocket technology</p>
+            <ul>
+                <li>Live chat room with multiple users</li>
+                <li>Real-time server metrics dashboard</li>
+                <li>Collaborative whiteboard drawing</li>
+                <li>Connection management with heartbeat</li>
+            </ul>
+            <a href="/websocket-demo" class="demo-link">Try WebSocket Demo →</a>
+        </div>
+        
+        <div class="feature-card">
+            <h3>✅ Input Validation & Security</h3>
+            <p>Comprehensive validation and sanitization framework</p>
+            <ul>
+                <li>Schema-based validation with Joi</li>
+                <li>XSS and SQL injection prevention</li>
+                <li>File validation with magic numbers</li>
+                <li>HTML sanitization and input cleaning</li>
+            </ul>
+            <a href="#validation-demo" class="demo-link">Test Validation →</a>
+        </div>
+    </div>
+</section>
+
+<section id="validation-demo" class="validation-demo">
+    <h2>🧪 Input Validation Test</h2>
+    
+    <div class="validation-form">
+        <h3>Test Message Validation</h3>
+        <form id="validation-form">
+            <div class="form-group">
+                <label for="test-message">Message:</label>
+                <textarea id="test-message" placeholder="Try entering HTML tags or SQL injections..." rows="3"></textarea>
+                <small class="hint">Validation will block HTML tags, SQL injections, and XSS attempts</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="test-username">Username:</label>
+                <input type="text" id="test-username" placeholder="Enter username">
+                <small class="hint">Only alphanumeric characters allowed</small>
+            </div>
+            
+            <button type="submit">Test Validation</button>
+            <button type="button" onclick="testMaliciousInput()">Test Malicious Input</button>
+        </form>
+        
+        <div id="validation-result" class="result"></div>
+    </div>
+    
+    <div class="validation-examples">
+        <h3>🔒 Security Checks Performed</h3>
+        <div class="security-checks">
+            <div class="check-item">
+                <strong>HTML Tag Detection:</strong>
+                <code>&lt;script&gt;alert('xss')&lt;/script&gt;</code> → Blocked
+            </div>
+            <div class="check-item">
+                <strong>SQL Injection:</strong>
+                <code>SELECT * FROM users</code> → Blocked
+            </div>
+            <div class="check-item">
+                <strong>XSS Attempts:</strong>
+                <code>javascript:alert(1)</code> → Blocked
+            </div>
+            <div class="check-item">
+                <strong>File Type Validation:</strong>
+                <code>fake.jpg.exe</code> → Blocked by magic numbers
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .upload-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            border: 2px solid #e2e8f0;
+        }
+        
+        .upload-form {
+            margin: 2rem 0;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-weight: bold;
+        }
+        
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 1.5rem;
+            border: 3px dashed #cbd5e0;
+            border-radius: 12px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .form-group input[type="file"]:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.2);
+        }
+        
+        .file-info {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+        
+        .progress-container {
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+        }
+        
+        .upload-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f0fff4 0%, #ffffff 100%);
+            border: 2px solid #c6f6d5;
+            border-left: 4px solid #48bb78;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .upload-result.error {
+            background: linear-gradient(135deg, #fed7d7 0%, #ffffff 100%);
+            border-color: #fc8181;
+            border-left-color: #f56565;
+        }
+        
+        .upload-result.success {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+        }
+        
+        .upload-result.error {
+            background: #fff5f5;
+            border-color: #fed7d7;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.8rem 1.5rem;
+            background: #4a5568;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+        
+        .back-link:hover {
+            background: #2d3748;
+        }
+        
+        .requirements {
+            background: #ebf8ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .requirements h3 {
+            color: #2c5282;
+            margin-bottom: 0.5rem;
+        }
+        
+        .requirements ul {
+            padding-left: 1.5rem;
+        }
+        
+        .requirements li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📤 File Upload Demo</h1>
+            <p>Test the file upload feature with validation</p>
+        </header>
+        
+        <div class="upload-container">
+            <h2>Upload Files</h2>
+            <p>Upload images or PDF documents (max 10MB per file)</p>
+            
+            <div class="requirements">
+                <h3>Requirements:</h3>
+                <ul>
+                    <li>Maximum file size: 10MB</li>
+                    <li>Allowed formats: JPEG, PNG, GIF, PDF</li>
+                    <li>Single file upload</li>
+                </ul>
+            </div>
+            
+            <form class="upload-form" id="uploadForm">
+                <div class="form-group">
+                    <label for="file">Select File:</label>
+                    <input type="file" id="file" name="file" required accept=".jpg,.jpeg,.png,.gif,.pdf">
+                    <div class="file-info" id="fileInfo">No file selected</div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="upload-button">Upload File</button>
+                </div>
+            </form>
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="progressText">0%</div>
+            </div>
+            
+            <div class="upload-result" id="uploadResult"></div>
+            
+            <a href="/" class="back-link">← Back to Home</a>
+        </div>
+    </div>
+    
+    <script>
+        const fileInput = document.getElementById('file');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadForm = document.getElementById('uploadForm');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const uploadResult = document.getElementById('uploadResult');
+        
+        // Update file info display
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                fileInfo.textContent = `${file.name} (${fileSize} MB, ${file.type})`;
+            } else {
+                fileInfo.textContent = 'No file selected';
+            }
+        });
+        
+        // Handle form submission
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const file = fileInput.files[0];
+            if (!file) {
+                showResult('Please select a file', false);
+                return;
+            }
+            
+            // Validate file size
+            if (file.size > 10 * 1024 * 1024) {
+                showResult('File size exceeds 10MB limit', false);
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'];
+            if (!allowedTypes.includes(file.type)) {
+                showResult('File type not allowed. Please upload JPEG, PNG, GIF, or PDF', false);
+                return;
+            }
+            
+            // Upload file
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Show progress
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+            
+            try {
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressFill.style.width = percentComplete + '%';
+                        progressText.textContent = Math.round(percentComplete) + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', function() {
+                    progressContainer.style.display = 'none';
+                    
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        showResult(`✅ Upload successful!\n\nFile: ${response.file.name}\nSize: ${(response.file.size / 1024 / 1024).toFixed(2)} MB\nType: ${response.file.type}\nPath: ${response.file.path}`, true);
+                    } else {
+                        const error = JSON.parse(xhr.responseText);
+                        showResult(`❌ Upload failed: ${error.error}`, false);
+                    }
+                });
+                
+                xhr.addEventListener('error', function() {
+                    progressContainer.style.display = 'none';
+                    showResult('❌ Upload failed: Network error', false);
+                });
+                
+                xhr.open('POST', '/upload');
+                xhr.send(formData);
+                
+            } catch (error) {
+                progressContainer.style.display = 'none';
+                showResult('❌ Upload failed: ' + error.message, false);
+            }
+        });
+        
+        function showResult(message, isSuccess) {
+            uploadResult.textContent = message;
+            uploadResult.className = 'upload-result ' + (isSuccess ? 'success' : 'error');
+            uploadResult.style.display = 'block';
+            
+            // Scroll to result
+            uploadResult.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

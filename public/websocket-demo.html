@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .panel {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .panel:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .chat-panel {
+            grid-column: 1;
+        }
+        
+        .metrics-panel {
+            grid-column: 2;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        #chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            min-height: 300px;
+        }
+        
+        #chat-messages:empty::before {
+            content: "No messages yet. Start chatting!";
+            color: #a0aec0;
+            font-style: italic;
+            display: block;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .message {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            background: #ebf8ff;
+            border-left: 3px solid #4299e1;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.system {
+            background: #f0fff4;
+            border-left-color: #48bb78;
+            font-style: italic;
+        }
+        
+        .message.you {
+            background: #e6fffa;
+            border-left-color: #38b2ac;
+            text-align: right;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        
+        .chat-input button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .chat-input button:active {
+            transform: translateY(0);
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            margin: 0.75rem 0;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #4299e1 0%, #48bb78 100%);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.15);
+            border-color: #4299e1;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4299e1 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #718096;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .connection-status {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .connected {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        .disconnected {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(0.98);
+            }
+        }
+        
+        .connection-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .info-badge {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .info-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+        }
+        
+        .connection-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        
+        .connection-controls button {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.9rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .connection-controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .connection-controls button:first-child {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .connection-controls button:nth-child(2) {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
+        
+        .connection-controls button:nth-child(3),
+        .connection-controls button:nth-child(4),
+        .connection-controls button:nth-child(5) {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+        
+        .subscriptions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .subscriptions label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .subscriptions label:hover {
+            background: #ebf8ff;
+            border-color: #4299e1;
+        }
+        
+        .subscriptions input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #4299e1;
+        }
+        
+        .subscriptions button {
+            margin-top: 0.75rem;
+            width: 100%;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            padding: 0.9rem;
+            font-weight: 600;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .subscriptions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+        
+        .chat-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .chat-controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: #4a5568;
+        }
+        
+        .chat-controls input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #4299e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔌 WebSocket Real-Time Demo</h1>
+            <p>Experience real-time communication with WebSocket</p>
+        </header>
+        
+        <div class="connection-info">
+            <div id="connection-status" class="connection-status disconnected">
+                🔴 Disconnected
+            </div>
+            <div class="info-badge" id="client-id">ID: ...</div>
+            <div class="info-badge" id="connection-count">Connections: 0</div>
+            <div class="info-badge" id="ping">Ping: -- ms</div>
+        </div>
+        
+        <div class="demo-container">
+            <div class="panel chat-panel">
+                <h2>💬 Real-Time Chat</h2>
+                <div id="chat-messages"></div>
+                <div class="chat-input" style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                    <input type="text" id="message-input" placeholder="Type your message..." maxlength="500" style="flex: 1; padding: 0.9rem; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; transition: all 0.3s ease;">
+                    <button onclick="sendMessage()" style="padding: 0.9rem 2rem; background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3); transition: all 0.3s ease;">Send</button>
+                    <button onclick="clearChat()" style="padding: 0.9rem 1.5rem; background: linear-gradient(135deg, #718096 0%, #4a5568 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(113, 128, 150, 0.3); transition: all 0.3s ease;">Clear</button>
+                </div>
+                <div class="chat-controls">
+                    <label>
+                        <input type="checkbox" id="auto-scroll" checked> Auto-scroll
+                    </label>
+                    <label>
+                        <input type="checkbox" id="show-timestamps" checked> Show timestamps
+                    </label>
+                </div>
+            </div>
+            
+            <div class="panel metrics-panel">
+                <h2>📊 Live Server Metrics</h2>
+                <div id="metrics-container">
+                    <div class="metric-card">
+                        <div class="metric-value" id="requests-total">0</div>
+                        <div class="metric-label">Total Requests</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="requests-per-second">0</div>
+                        <div class="metric-label">Requests/Second</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="active-connections">0</div>
+                        <div class="metric-label">Active Connections</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="server-uptime">0s</div>
+                        <div class="metric-label">Server Uptime</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 1.5rem;">🔔 Subscriptions</h3>
+                <div class="subscriptions">
+                    <label><input type="checkbox" id="sub-chat" checked> Chat Messages</label>
+                    <label><input type="checkbox" id="sub-metrics" checked> Server Metrics</label>
+                    <label><input type="checkbox" id="sub-notifications"> Notifications</label>
+                    <button onclick="updateSubscriptions()">Update Subscriptions</button>
+                </div>
+            </div>
+            
+            <div class="panel full-width">
+                <h2>⚙️ Connection Management</h2>
+                <div class="connection-controls">
+                    <button onclick="connectWebSocket()" id="connect-btn">Connect</button>
+                    <button onclick="disconnectWebSocket()" id="disconnect-btn">Disconnect</button>
+                    <button onclick="sendPing()">Ping Server</button>
+                    <button onclick="testBroadcast()">Test Broadcast</button>
+                    <button onclick="clearConsole()">Clear Console</button>
+                </div>
+                
+                <div class="log-container">
+                    <h3>📝 Connection Log</h3>
+                    <div id="connection-log" style="
+                        height: 150px;
+                        overflow-y: auto;
+                        background: #2d3748;
+                        color: #e2e8f0;
+                        padding: 1rem;
+                        border-radius: 5px;
+                        font-family: monospace;
+                        font-size: 0.9rem;
+                    "></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🎯 Features Demonstrated</h3>
+            <ul>
+                <li><strong>Real-time bidirectional communication</strong> - Chat messages appear instantly for all users</li>
+                <li><strong>Live server metrics</strong> - Watch requests, connections, and performance in real-time</li>
+                <li><strong>Connection management</strong> - Automatic reconnection, heartbeat, and status monitoring</li>
+                <li><strong>Selective subscriptions</strong> - Choose which events to receive</li>
+                <li><strong>Error handling</strong> - Graceful disconnection and reconnection</li>
+            </ul>
+            
+            <h3>🔧 Technical Implementation</h3>
+            <ul>
+                <li>WebSocket server with connection pooling</li>
+                <li>Heartbeat mechanism to detect dead connections</li>
+                <li>Message broadcasting to multiple clients</li>
+                <li>JSON-based message protocol</li>
+                <li>Automatic reconnection on disconnect</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>WebSocket Demo | <a href="/">Back to Home</a> | <a href="/whiteboard">Try Whiteboard Demo</a></p>
+        </footer>
+    </div>
+    
+    <script src="websocket-demo.js"></script>
+</body>
+</html>

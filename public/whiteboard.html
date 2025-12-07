@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Whiteboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .whiteboard-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            height: 80vh;
+        }
+        
+        .tools-panel {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid #e2e8f0;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .whiteboard-area {
+            background: white;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        #whiteboard-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            background: #fff;
+        }
+        
+        .tool-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .tool-group h3 {
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+        
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-option.active {
+            border-color: #2d3748;
+            transform: scale(1.1);
+        }
+        
+        .brush-sizes {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .brush-size {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #2d3748;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .brush-size.active {
+            background: #4299e1;
+        }
+        
+        .tool-button {
+            width: 100%;
+            padding: 0.9rem;
+            margin: 0.5rem 0;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+        }
+        
+        .tool-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+        
+        .tool-button:active {
+            transform: translateY(0);
+        }
+        
+        .user-list {
+            margin-top: 1rem;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.3rem 0;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .user-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .drawing-history {
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 0.3rem;
+            margin: 0.2rem 0;
+            background: white;
+            border-radius: 3px;
+            font-size: 0.8rem;
+        }
+        
+        .connection-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .connection-status.connected {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.95) 0%, rgba(56, 161, 105, 0.95) 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-status.disconnected {
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.95) 0%, rgba(229, 62, 62, 0.95) 100%);
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Collaborative Whiteboard</h1>
+            <p>Draw together in real-time with WebSocket communication</p>
+        </header>
+        
+        <div class="connection-status disconnected" id="whiteboard-status">
+            🔴 Connecting to whiteboard...
+        </div>
+        
+        <div class="whiteboard-container">
+            <div class="tools-panel">
+                <div class="tool-group">
+                    <h3>🎨 Colors</h3>
+                    <div class="color-picker" id="color-picker">
+                        <!-- Colors will be added by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="tool-group">
+                    <h3>🖌️ Brush Size</h3>
+                    <div class="brush-sizes" id="brush-sizes">
+                        <!-- Brush sizes will be added by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="tool-group">
+                    <h3>⚒️ Tools</h3>
+                    <button class="tool-button" onclick="clearCanvas()">Clear Canvas</button>
+                    <button class="tool-button" onclick="undoLast()">Undo Last</button>
+                    <button class="tool-button" onclick="saveDrawing()">Save Drawing</button>
+                    <button class="tool-button" onclick="loadPreset()">Load Preset</button>
+                </div>
+                
+                <div class="tool-group">
+                    <h3>👥 Active Users</h3>
+                    <div id="user-list" class="user-list">
+                        <div class="user-item">
+                            <div class="user-color" style="background: #000;"></div>
+                            <span>You</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-group">
+                    <h3>📝 Drawing History</h3>
+                    <div id="drawing-history" class="drawing-history">
+                        <!-- History items will be added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="whiteboard-area">
+                <canvas id="whiteboard-canvas"></canvas>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🎯 How to Use</h3>
+            <ol>
+                <li><strong>Select a color</strong> from the color picker</li>
+                <li><strong>Choose brush size</strong> for your drawing</li>
+                <li><strong>Draw on the canvas</strong> - your strokes appear in real-time for all users</li>
+                <li><strong>Watch others draw</strong> - see strokes from other connected users</li>
+                <li><strong>Use tools</strong> to clear, undo, or save the drawing</li>
+            </ol>
+            
+            <h3>🔧 Technical Implementation</h3>
+            <ul>
+                <li>Real-time stroke broadcasting via WebSocket</li>
+                <li>Each user gets a unique color for identification</li>
+                <li>Drawing data includes coordinates, color, size, and timestamps</li>
+                <li>Automatic reconnection if WebSocket disconnects</li>
+                <li>Local drawing cache for smooth experience</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>Collaborative Whiteboard | <a href="/websocket-demo">Back to WebSocket Demo</a> | <a href="/">Home</a></p>
+        </footer>
+    </div>
+    
+    <script src="whiteboard.js"></script>
+</body>
+</html>
