@@ -259,27 +259,7 @@ Web server/
 └── README.md
 ```
 
-## 🎯 Key Highlights for Resume
 
-### Technical Skills Demonstrated
-- **Backend Development**: Custom HTTP server implementation from scratch (no Express.js)
-- **Real-Time Communication**: WebSocket protocol implementation with connection management
-- **System Architecture**: Modular, scalable server design with proper separation of concerns
-- **API Development**: RESTful endpoints with JSON responses and CORS support
-- **Connection Management**: Efficient WebSocket connection pooling with limits and heartbeat
-- **Performance Monitoring**: Real-time metrics and analytics with thread-safe operations
-- **Error Handling**: Comprehensive error handling and graceful degradation
-- **Security Implementation**:
-  - Path traversal attack prevention
-  - XSS and SQL injection protection
-  - Connection limits and DoS protection
-  - File upload validation and sanitization
-  - Safe error message handling (production-ready)
-- **Performance Optimization**:
-  - Async, non-blocking operations
-  - Smart caching strategies
-  - Memory leak prevention
-  - Race condition handling
 
 ### Project Features
 - ✅ Built from scratch without frameworks (Express, etc.)
