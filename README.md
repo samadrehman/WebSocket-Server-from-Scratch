@@ -75,7 +75,7 @@ Prerequisites
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/samadrehman/WebSocket-Server-from-Scratch
    cd "Web server"
    ```
 
@@ -388,7 +388,6 @@ This project has been thoroughly reviewed and all security, performance, and rel
 
 MIT License - feel free to use this project for learning and portfolio purposes.
 
-See [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
