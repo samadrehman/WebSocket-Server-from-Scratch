@@ -1,4 +1,4 @@
-# 🚀 Advanced Web Server with WebSocket Support
+#  Advanced Web Server with WebSocket Support
 
 A production-ready, feature-rich HTTP/WebSocket server built from scratch with Node.js. This project demonstrates advanced server architecture, real-time communication, and modern web development practices.
 
@@ -6,7 +6,7 @@ A production-ready, feature-rich HTTP/WebSocket server built from scratch with N
 ![License](https://img.shields.io/badge/License-MIT-blue)
 ![WebSocket](https://img.shields.io/badge/WebSocket-Enabled-brightgreen)
 
-## ✨ Features
+##  Features
 
 ### Core Server Features
 - **Custom HTTP Server** - Built from scratch using Node.js native `http` module
@@ -43,7 +43,7 @@ A production-ready, feature-rich HTTP/WebSocket server built from scratch with N
   - Memory-efficient operations with automatic cleanup
 - **Scalable Architecture** - Modular design for easy extension
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 Web Server/
@@ -64,7 +64,7 @@ Web Server/
 └── package.json
 ```
 
- 🚀 Getting Started
+  Getting Started
 
 Prerequisites
 
@@ -231,7 +231,7 @@ Connect to `ws://localhost:3000` (or `wss://` for secure connections).
 - **WebSocket**: `ws` library
 - **Development**: `nodemon` for auto-reload
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 Web server/
@@ -262,15 +262,15 @@ Web server/
 
 
 ### Project Features
-- ✅ Built from scratch without frameworks (Express, etc.)
-- ✅ Real-time bidirectional communication with WebSocket
-- ✅ Production-ready architecture with security best practices
-- ✅ Clean, maintainable code structure
-- ✅ Comprehensive documentation
-- ✅ Multiple interactive demos (Chat, Whiteboard, Metrics)
-- ✅ **Security Hardened**: All critical, high, and medium priority security issues resolved
-- ✅ **Performance Optimized**: Async operations, smart caching, memory management
-- ✅ **Error Resilient**: Proper error handling, reconnection logic, graceful degradation
+- Built from scratch without frameworks (Express, etc.)
+- Real-time bidirectional communication with WebSocket
+- Production-ready architecture with security best practices
+- Clean, maintainable code structure
+- Comprehensive documentation
+-  Multiple interactive demos (Chat, Whiteboard, Metrics)
+- **Security Hardened**: All critical, high, and medium priority security issues resolved
+- **Performance Optimized**: Async operations, smart caching, memory management
+- **Error Resilient**: Proper error handling, reconnection logic, graceful degradation
 
 ## 🔧 Configuration
 
@@ -384,12 +384,12 @@ This project has been thoroughly reviewed and all security, performance, and rel
 - Added proper error handling in client code
 - Fixed subscription initialization
 
-## 📄 License
+##  License
 
 MIT License - feel free to use this project for learning and portfolio purposes.
 
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with Node.js and WebSocket technology
 - Inspired by modern web server architectures
@@ -397,7 +397,7 @@ MIT License - feel free to use this project for learning and portfolio purposes.
 
 ---
 
-⭐ **Star this repo if you find it helpful!**
+ **Star this repo if you find it helpful!**
 
 📧 **Questions?** Open an issue or reach out!
 
